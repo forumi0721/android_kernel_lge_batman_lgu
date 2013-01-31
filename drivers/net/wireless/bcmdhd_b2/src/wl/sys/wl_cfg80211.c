@@ -1209,9 +1209,9 @@ wl_cfg80211_del_virtual_iface(struct wiphy *wiphy, struct net_device *dev)
 				(wl_get_p2p_status(wl, IF_DELETING) == false),
 				msecs_to_jiffies(MAX_WAIT_TIME));
 			if (timeout > 0 && !wl_get_p2p_status(wl, IF_DELETING)) {
-				WL_DBG(("IFDEL operation done\n"));
+				WL_DBG(("IFDEL operation done:timeout[%d]\n", timeout));
 			} else {
-				WL_ERR(("IFDEL didn't complete properly\n"));
+				WL_ERR(("IFDEL didn't complete properly[%d]\n", timeout));
 			}
 			ret = dhd_del_monitor(dev);
 		}
@@ -1334,8 +1334,26 @@ wl_cfg80211_notify_ifadd(struct net_device *ndev, s32 idx, s32 bssidx,
 	return ret;
 }
 
+#ifdef CONFIG_LGE_BCM432X_PATCH   //                                                                  
+s32
+wl_cfg80211_notify_ifdel(void)
+{
+	struct wl_priv *wl = wlcfg_drv_priv;
+	
+	WL_DBG(("Enter \n"));
+	wl_clr_p2p_status(wl, IF_DELETING);
+
+	return 0;
+}
+#endif
+
+#ifdef CONFIG_LGE_BCM432X_PATCH
+s32
+wl_cfg80211_ifdel_ops(struct net_device *ndev)
+#else
 s32
 wl_cfg80211_notify_ifdel(struct net_device *ndev)
+#endif   //                                                                  
 {
 	struct wl_priv *wl = wlcfg_drv_priv;
 	bool rollback_lock = false;
@@ -1370,7 +1388,9 @@ wl_cfg80211_notify_ifdel(struct net_device *ndev)
 		wl->p2p->vif_created = false;
 		wl_cfgp2p_clear_management_ie(wl,
 			index);
+#ifndef CONFIG_LGE_BCM432X_PATCH  //                                                                  
 		wl_clr_p2p_status(wl, IF_DELETING);
+#endif  //                                                                  
 		WL_DBG(("index : %d\n", index));
 
 	}
@@ -4891,6 +4911,14 @@ static s32 wl_inform_single_bss(struct wl_priv *wl, struct wl_bss_info *bi)
 		band = wiphy->bands[IEEE80211_BAND_2GHZ];
 	else
 		band = wiphy->bands[IEEE80211_BAND_5GHZ];
+#ifdef CONFIG_LGE_BCM432X_PATCH   //                                                                  
+	if(band == NULL) {
+		WL_ERR(("invalid band is selected, band is NULL\n"));
+		kfree(notif_bss_info);
+		return -EINVAL;
+	}
+#endif  //                                                                  
+
 	notif_bss_info->rssi = dtoh16(bi->RSSI);
 	memcpy(mgmt->bssid, &bi->BSSID, ETHER_ADDR_LEN);
 	mgmt_type = wl->active_scan ?
@@ -5201,11 +5229,21 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 
 		} else if (wl_is_linkdown(wl, e)) {
 			if (wl->scan_request) {
+
+#ifdef CONFIG_LGE_BCM432X_PATCH   //                                                                  
+				if (wl->escan_on) {
+					wl_cfg80211_scan_abort(wl, ndev);
+				} else {
+					del_timer_sync(&wl->scan_timeout);
+					wl_iscan_aborted(wl);
+				}
+#else
 				del_timer_sync(&wl->scan_timeout);
 				if (wl->escan_on) {
 					wl_notify_escan_complete(wl, ndev, true);
 				} else
 					wl_iscan_aborted(wl);
+#endif   //                                                                  
 			}
 			if (wl_get_drv_status(wl, CONNECTED, ndev)) {
 				scb_val_t scbval;
@@ -5235,11 +5273,20 @@ wl_notify_connect_status(struct wl_priv *wl, struct net_device *ndev,
 				event, (int)ntoh32(e->status));
 			/* Clean up any pending scan request */
 			if (wl->scan_request) {
+#ifdef CONFIG_LGE_BCM432X_PATCH  //                                                                  
+				if (wl->escan_on) {
+					wl_cfg80211_scan_abort(wl, ndev);
+				} else {
+					del_timer_sync(&wl->scan_timeout);
+					wl_iscan_aborted(wl);
+				}
+#else
 				del_timer_sync(&wl->scan_timeout);
 				if (wl->escan_on) {
 					wl_notify_escan_complete(wl, ndev, true);
 				} else
 					wl_iscan_aborted(wl);
+#endif  //                                                                  
 			}
 			if (wl_get_drv_status(wl, CONNECTING, ndev))
 				wl_bss_connect_done(wl, ndev, e, data, false);
@@ -6356,6 +6403,17 @@ static s32 wl_escan_handler(struct wl_priv *wl,
 			mutex_unlock(&wl->usr_sync);
 		}
 	}
+#ifdef CONFIG_LGE_BCM432X_PATCH    //                                                                  
+	else if (status == WLC_E_STATUS_NEWSCAN)
+	{
+		escan_result = (wl_escan_result_t *)data;
+		if (escan_result)
+		{
+			WL_ERR(("P:WLC_E_STATUS_NEWSCAN!!!!!!:scan_request[%p]", wl->scan_request));
+			WL_ERR(("P:sync_id[%d]:bss_count[%d]", escan_result->sync_id, escan_result->bss_count));
+		}
+	}
+#endif  //                                                                  
 	else {
 		WL_ERR(("unexpected Escan Event %d : abort\n", status));
 		wl->escan_info.escan_state = WL_ESCAN_STATE_IDLE;

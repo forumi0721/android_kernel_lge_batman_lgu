@@ -154,7 +154,9 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 	for (i = 0; i < array_size; i++) {
 #ifdef CONFIG_LGE_DEBUG
 		if (other_free < lowmem_minfree[i] &&
-		    other_file < lowmem_minfree[i]*2) {
+		    //other_file < lowmem_minfree[i]*2) {
+		    //other_file < lowmem_minfree[i]) {
+		    other_file < ((lowmem_minfree[i]*15)/10)) {
 		    lowmem_print(6, "lowmem_minfree[i] %d owmem_minfree[i]*3 %d, i %d\n",
 			             lowmem_minfree[i], lowmem_minfree[i]*2, i);        
 			min_adj = lowmem_adj[i];

@@ -824,15 +824,15 @@ static struct msm_bus_vectors mdp_1080p_vectors[] = {
 	{
 		.src = MSM_BUS_MASTER_MDP_PORT0,
 		.dst = MSM_BUS_SLAVE_SMI,
-		.ab = 375367680,    //(1024x768x60x4)+(1920x1080x60x1.5)
-		.ib = 469209600,    //.ab x 1.25
+		.ab = 941598720,    //(1024x768x60x4x4)+(1920x1080x60x1.5)
+		.ib = 1176998400,    //.ab x 1.25
 	},
 	/* Master and slaves can be from different fabrics */
 	{
 		.src = MSM_BUS_MASTER_MDP_PORT0,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
-		.ab = 375367680,    //(1024x768x60x4)+(1920x1080x60x1.5)
-		.ib = 938419200,    //.ab x 1.25 x 2
+		.ab = 941598720,    //(1024x768x60x4x4)+(1920x1080x60x1.5)
+		.ib = 2000000000,    //.ab x 1.25 x 2 (or MAX)
 	},
 };
 

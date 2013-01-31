@@ -493,23 +493,29 @@ static void charm_modem_shutdown(struct platform_device *pdev)
 	gpio_set_value(AP2MDM_STATUS, 0);
 	gpio_set_value(AP2MDM_WAKEUP, 1);
 
+#ifndef LGE_DONT_CHECK_MDM_GPIO
 	for (i = CHARM_MODEM_TIMEOUT; i > 0; i -= CHARM_MODEM_DELTA) {
 		pet_watchdog();
 		msleep(CHARM_MODEM_DELTA);
 		if (gpio_get_value(MDM2AP_STATUS) == 0)
 			break;
 	}
+#endif /* LGE_DONT_CHECK_MDM_GPIO */
 
+#ifndef LGE_DONT_CHECK_MDM_GPIO
 	if (i <= 0) {
 		pr_err("%s: MDM2AP_STATUS never went low.\n",
 			 __func__);
+	}
+#endif /* LGE_DONT_CHECK_MDM_GPIO */
+		pr_err("%s: AP2MDM_PMIC_RESET_N goes low!!\n",__func__);
 		gpio_direction_output(AP2MDM_PMIC_RESET_N, 1);
 		for (i = CHARM_HOLD_TIME; i > 0; i -= CHARM_MODEM_DELTA) {
 			pet_watchdog();
 			msleep(CHARM_MODEM_DELTA);
 		}
 		gpio_direction_output(AP2MDM_PMIC_RESET_N, 0);
-	}
+
 	gpio_set_value(AP2MDM_WAKEUP, 0);
 }
 

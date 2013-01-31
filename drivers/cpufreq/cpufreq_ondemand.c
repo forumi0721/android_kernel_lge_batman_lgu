@@ -772,7 +772,7 @@ static void dbs_input_event(struct input_handle *handle, unsigned int type,
 #ifdef CONFIG_LGE_PM_CURRENT_CONSUMPTION_FIX 
 	if(!strcmp((char*)(handle->dev->name), "accelerometer") || !strcmp((char*)(handle->dev->name), "proximity") || 
 	!strcmp((char*)(handle->dev->name), "magnetic_field") || !strcmp((char*)(handle->dev->name), "gyroscope")||
-	!strcmp((char*)(handle->dev->name), "light") || !strcmp((char*)(handle->dev->name), "touch_dev"))
+	!strcmp((char*)(handle->dev->name), "light") || !strcmp((char*)(handle->dev->name), "synaptics_ts"))
 	{
 		//printk(KERN_INFO "Not Bumping up CPU for %s", handle->dev->name);
 		return; 

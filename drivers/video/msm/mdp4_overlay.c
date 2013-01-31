@@ -2159,11 +2159,11 @@ static uint32 mdp4_overlay_get_perf_level(struct mdp_overlay *req,
 	if (mdp4_extn_disp)
 		return OVERLAY_PERF_LEVEL1;
 
-	if (req->flags & MDP_DEINTERLACE)
+	if (req->flags & (MDP_DEINTERLACE | MDP_BACKEND_COMPOSITION)) // QC
 		return OVERLAY_PERF_LEVEL1;
 
 	for (i = 0, cnt = 0; i < OVERLAY_PIPE_MAX; i++) {
-		if (ctrl->plist[i].pipe_used && ++cnt > 2)
+		if (ctrl->plist[i].pipe_used && ++cnt >= 2) //QC
 			return OVERLAY_PERF_LEVEL1;
 	}
 
@@ -2212,9 +2212,8 @@ void mdp4_set_perf_level(void)
 	if (old_perf_level != cur_perf_level) {
 		mdp_set_core_clk(cur_perf_level);
 		old_perf_level = cur_perf_level;
-		mdp_bus_scale_update_request(OVERLAY_BUS_SCALE_TABLE_BASE
-					     - cur_perf_level);
 	}
+	mdp_bus_scale_update_request(OVERLAY_BUS_SCALE_TABLE_BASE - cur_perf_level);
 }
 
 static void mdp4_overlay_update_blt_mode(struct msm_fb_data_type *mfd)

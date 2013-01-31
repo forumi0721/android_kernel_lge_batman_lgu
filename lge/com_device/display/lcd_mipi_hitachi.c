@@ -53,7 +53,7 @@ static char set_display_off[2] =  {0x28,0x00};
 static char enter_sleep_mode[2] =  {0x10,0x00};
 
 //Colume inversion
-static char Panel_Driving_Setting_Colume_inversion [9] = {0xC1, 0x00, 0x50, 0x04, 0x22, 0x16, 0x08, 0x60, 0x01};
+//static char Panel_Driving_Setting_Colume_inversion [9] = {0xC1, 0x00, 0x50, 0x04, 0x22, 0x16, 0x08, 0x60, 0x01};
 
 //2Dot inversion
 //static char Panel_Driving_Setting_2Dot_inversion [9] = {0xC1, 0x00, 0x10, 0x04, 0x22, 0x16, 0x08, 0x60, 0x01};
@@ -116,9 +116,9 @@ static struct dsi_cmd_desc hitachi_power_on_set[] = {
 	{DTYPE_GEN_WRITE2, 1, 0, 0, 0, sizeof(Manufacture_Command_Access_End),Manufacture_Command_Access_End},
 #endif
 	//Column inversion
-	{DTYPE_GEN_WRITE2, 1, 0, 0, 0, sizeof(Manufacture_Command_Access_Start),Manufacture_Command_Access_Start},
-	{DTYPE_GEN_LWRITE, 1, 0, 0, 0, sizeof(Panel_Driving_Setting_Colume_inversion),Panel_Driving_Setting_Colume_inversion},
-	{DTYPE_GEN_WRITE2, 1, 0, 0, 0, sizeof(Manufacture_Command_Access_End),Manufacture_Command_Access_End},
+//	{DTYPE_GEN_WRITE2, 1, 0, 0, 0, sizeof(Manufacture_Command_Access_Start),Manufacture_Command_Access_Start},
+//	{DTYPE_GEN_LWRITE, 1, 0, 0, 0, sizeof(Panel_Driving_Setting_Colume_inversion),Panel_Driving_Setting_Colume_inversion},
+//	{DTYPE_GEN_WRITE2, 1, 0, 0, 0, sizeof(Manufacture_Command_Access_End),Manufacture_Command_Access_End},
 	//set_display_on
 	{DTYPE_DCS_LWRITE, 1, 0, 0, 0, sizeof(set_address_mode),set_address_mode},
 	{DTYPE_DCS_WRITE1, 1, 0, 0, 0, sizeof(set_pixel_format),set_pixel_format},

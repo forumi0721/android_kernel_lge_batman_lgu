@@ -441,9 +441,11 @@ struct input_keymap_entry {
 #if defined(CONFIG_MACH_LGE_325_BOARD)
 #define KEY_HIGHLIGHER					499
 #endif
+#define KEY_VIDEO_CALL_END		252	/* Key For Vedio CAll*/
+#define KEY_VIDEO_CALL_RECEIVE		253	/* Key For Vedio CAll*/
 #define KEY_VIDEO_CALL		254	/* Key For Vedio CAll*/
 
-#define KEY_PWR_OFF_CHG_REBOOT		500  /* [LGE_UPDATE - PowerOff CHG] */
+#define KEY_PWR_OFF_CHG_REBOOT		500  /*                             */
 
 /* Code 255 is reserved for special needs of AT keyboard driver */
 

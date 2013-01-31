@@ -140,7 +140,6 @@ static void lm3533_set_main_current_level(struct i2c_client *client, int level)
 #endif
 			if(level >= 1 && level <= 255)
 			{
-#if defined(CONFIG_MACH_LGE_325_BOARD_VZW)
 				// make 50% UI brightness current to 6.18mA
 				if( level>=129 && level<=131 ) {
 					cal_value = 78;
@@ -149,13 +148,6 @@ static void lm3533_set_main_current_level(struct i2c_client *client, int level)
 				} else {
 					cal_value = ((level-132)*1770 + 78*1230)/1230;
 				}
-#else
-				cal_value = (((level*2530-2*2530)/253)*251 + 4*2530)/2530; //input min=2, Max255,,, Output min 4 ; max 255
-#endif
-				//if(cal_value < 165)
-				//	cal_value = (cal_value*108)/100 - 38;
-				//else
-				//	cal_value = (cal_value*150)/100 - 100;
 			}
 			else{
 				mdelay(1);

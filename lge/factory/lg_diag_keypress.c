@@ -70,6 +70,8 @@ keycode_trans_type keytrans_table[KEY_TRANS_MAP_SIZE]={
 /* index = 30 */{0x09, V_KEY_DIAL},
 /* index = 31 */{0x0A, V_KEY_EDITBOX},
 /* index = 32 */{0xB5, KEY_VIDEO_CALL},
+/* index = 32 */{0xB6, KEY_VIDEO_CALL_RECEIVE},
+/* index = 32 */{0xB7, KEY_VIDEO_CALL_END},
 };
 
 unsigned int LGF_KeycodeTrans(word input)

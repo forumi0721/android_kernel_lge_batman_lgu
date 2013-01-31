@@ -1083,11 +1083,23 @@ dhd_op_if(dhd_if_t *ifp)
 			DHD_TRACE(("\n%s: got 'DHD_IF_DEL' state\n", __FUNCTION__));
 #ifdef WL_CFG80211
 			if (dhd->dhd_state & DHD_ATTACH_STATE_CFG80211) {
+#ifdef CONFIG_LGE_BCM432X_PATCH      //                                                                  
+				wl_cfg80211_ifdel_ops(ifp->net);
+#else
 				wl_cfg80211_notify_ifdel(ifp->net);
+#endif
 			}
 #endif
 			netif_stop_queue(ifp->net);
 			unregister_netdev(ifp->net);
+
+#ifdef CONFIG_LGE_BCM432X_PATCH
+#ifdef WL_CFG80211
+			if (dhd->dhd_state & DHD_ATTACH_STATE_CFG80211) {
+				wl_cfg80211_notify_ifdel();
+			}
+#endif
+#endif	      //                                                                  
 			ret = DHD_DEL_IF;	/* Make sure the free_netdev() is called */
 		}
 		break;
@@ -5032,12 +5044,21 @@ int net_os_set_packet_filter(struct net_device *dev, int val)
 }
 
 
+#ifdef CONFIG_LGE_BCM432X_PATCH   //                                                                  
+int
+dhd_dev_init_ioctl(struct net_device *dev)
+#else
 void
 dhd_dev_init_ioctl(struct net_device *dev)
+#endif
 {
 	dhd_info_t *dhd = *(dhd_info_t **)netdev_priv(dev);
 
+#ifdef CONFIG_LGE_BCM432X_PATCH
+	return dhd_preinit_ioctls(&dhd->pub);
+#else
 	dhd_preinit_ioctls(&dhd->pub);
+#endif   //                                                                  
 }
 
 #ifdef PNO_SUPPORT
@@ -5095,8 +5116,10 @@ int net_os_send_hang_message(struct net_device *dev)
 #endif
 #if defined(WL_CFG80211)
 			ret = wl_cfg80211_hang(dev, WLAN_REASON_UNSPECIFIED);
-			dev_close(dev);
+#ifndef CONFIG_LGE_BCM432X_PATCH   //                                                                  
+			dev_close(dev); 
 			dev_open(dev);
+#endif   //                                                                  
 #endif
 		}
 	}
